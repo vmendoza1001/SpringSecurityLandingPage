@@ -1,5 +1,6 @@
 package com.example.SpringSecurityWithLandingPage.security;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,50 +34,35 @@ public class DemoSecurityConfig {
                 .build();
 
         return new InMemoryUserDetailsManager(john, mary, susan);
-
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-            http.authorizeHttpRequests(configurer ->
-                            configurer
-                                    .requestMatchers("/").permitAll()
-                                    .requestMatchers("/employees/**").hasRole("EMPLOYEE")
-                                    .requestMatchers("/leaders/**").hasRole("MANAGER")
-                                    .requestMatchers("/systems/**").hasRole("ADMIN")
-                    )
-                    .formLogin(form ->
-                            form
-                                    .loginPage("/showMyLoginPage")
-                                    .loginProcessingUrl("/authenticateTheUser")
-                                    .permitAll()
-
-                    )
-                    .logout(logout ->
-                            logout
-                                    .permitAll()
-                                    .logoutSuccessUrl("/")
-                    )
-                    .exceptionHandling(configurer ->
-                            configurer.accessDeniedPage("/access-denied")
-
-                    );
-
-            return http.build();
-        }
-
     }
 
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        http.authorizeHttpRequests(configurer ->
+                        configurer
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/employees/**").hasRole("EMPLOYEE")
+                                .requestMatchers("/leaders/**").hasRole("MANAGER")
+                                .requestMatchers("/systems/**").hasRole("ADMIN")
+                                .anyRequest().authenticated()
+                )
+                .formLogin(form ->
+                        form
+                                .loginPage("/showMyLoginPage")
+                                .loginProcessingUrl("/authenticateTheUser")
+                                .permitAll()
+                )
+                .logout(logout ->
+                        logout
+                                .permitAll()
+                                .logoutSuccessUrl("/")
+                )
+                .exceptionHandling(configurer ->
+                        configurer.accessDeniedPage("/access-denied")
+                );
 
-
-
-
-
-
-
-
-
-
-
+        return http.build();
+    }
 
 }
